@@ -1,6 +1,6 @@
 # underbase-cli
 
-[![build status](https://img.shields.io/travis/sundowndev/underbase-cli/master.svg?style=flat-square)](https://travis-ci.org/sundowndev/underbase)
+[![build status](https://img.shields.io/travis/sundowndev/underbase-cli/master.svg?style=flat-square)](https://travis-ci.org/sundowndev/underbase-cli)
 [![tag](https://img.shields.io/github/tag/sundowndev/underbase-cli.svg?style=flat-square)](https://github.com/sundowndev/underbase-cli/releases)
 [![dependencies](https://david-dm.org/sundowndev/underbase-cli/status.svg?style=flat-square)](https://david-dm.org/sundowndev/underbase-cli)
 
