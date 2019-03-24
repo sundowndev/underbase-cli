@@ -6,7 +6,7 @@
 
 >MongoDB migrations done right. Abstract framework and CLI app for writing, executing, and organizing your database migrations.
 
-Look at [underbase](https://github.com/sundowndev/underbase-cli) for programmatic usage.
+Look at [underbase](https://github.com/sundowndev/underbase) for programmatic usage.
 
 ## Installation
 
