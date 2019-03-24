@@ -1,0 +1,16 @@
+language: node_js
+
+services:
+  - docker
+
+node_js:
+  - "7"
+  - "8"
+
+before_script:
+  - npm install
+script:
+  - npm run lint
+  - npm run build
+  #- npm run docker:test
+  #- npm run docker:down
