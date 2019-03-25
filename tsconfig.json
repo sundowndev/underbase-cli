@@ -2,11 +2,10 @@
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
-    "jsx": "react",
     "moduleResolution": "node",
     "declaration": true,
-    "rootDir": ".",
-    "outDir": "dist",
+    "rootDir": "src",
+    "outDir": "bin",
     "baseUrl": ".",
     "sourceMap": true,
     "typeRoots": [
@@ -18,11 +17,10 @@
     "paths": {
       "*": [
         "node_modules/@types/*",
-        "src/*",
         "*"
       ],
       "af-data-models": [
-        "src/*"
+        "*"
       ]
     }
   },
