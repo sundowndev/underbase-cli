@@ -3,7 +3,7 @@
     "config:base"
   ],
   "baseBranches": [
-    "master"
+    "develop"
   ],
   "labels": [
     "bot:renovate"
@@ -13,5 +13,6 @@
   "automerge": true,
   "major": {
     "automerge": false
-  }
+  },
+  "bumpVersion": "patch",
 }
