@@ -9,5 +9,9 @@
     "bot:renovate"
   ],
   "commitMessagePrefix": "Renovate:",
-  "separateMultipleMajor": true
+  "separateMultipleMajor": true,
+  "automerge": true,
+  "major": {
+    "automerge": false
+  }
 }
