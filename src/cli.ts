@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { migrator } from 'underbase';
 import * as yargs from 'yargs';
 import * as path from 'path';
