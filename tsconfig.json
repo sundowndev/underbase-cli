@@ -3,6 +3,7 @@
     "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
+    "noImplicitAny": true,
     "declaration": false,
     "rootDir": "src",
     "outDir": "bin",
@@ -14,18 +15,5 @@
     "pretty": true,
     "removeComments": true,
     "traceResolution": false,
-    "paths": {
-      "*": [
-        "node_modules/@types/*",
-        "*"
-      ],
-      "af-data-models": [
-        "*"
-      ]
-    }
   },
-  "files": [
-    "src/cli.ts"
-  ]
 }
-
