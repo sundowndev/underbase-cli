@@ -38,10 +38,9 @@ const argv = yargs
 
 let metro = <configFile>{};
 
-try {
+if (argv.config) {
   metro = require(<string>argv.config);
 }
-catch (err) { }
 
 const config = <config>{
   // false disables logging
