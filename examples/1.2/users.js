@@ -7,7 +7,7 @@ export default {
       .updateMany(
         {},
         {
-          $unset: { isAdmin: 1, isSuperAdmin: 1 },
+          $rename: { firstName: 'name' },
         }, { multi: true }
       );
   },
@@ -18,7 +18,7 @@ export default {
       .updateMany(
         {},
         {
-          $set: { isAdmin: false, isSuperAdmin: false },
+          $rename: { name: 'firstName' },
         }, { multi: true }
       );
   }

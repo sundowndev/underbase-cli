@@ -1,15 +1,13 @@
-import user from './user';
-import workspaces from './workspaces';
+// Import Users collection mirgation
+import users from './users';
 
 export default {
   version: 1.0,
-  name: '1.0',
+  name: 'Users',
   up: async (db) => {
-    await user.up(db);
-    await workspaces.up(db);
+    await users.up(db);
   },
   down: async (db) => {
-    await user.down(db);
-    await workspaces.down(db);
+    await users.down(db);
   }
 };
