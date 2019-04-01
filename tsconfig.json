@@ -3,11 +3,11 @@
     "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
-    "declaration": true,
+    "declaration": false,
     "rootDir": "src",
     "outDir": "bin",
     "baseUrl": ".",
-    "sourceMap": true,
+    "sourceMap": false,
     "typeRoots": [
       "node_modules/@types"
     ],
@@ -26,9 +26,6 @@
   },
   "files": [
     "src/cli.ts"
-  ],
-  "include": [
-    "test/**/*"
   ]
 }
 
