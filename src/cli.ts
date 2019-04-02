@@ -1,28 +1,30 @@
 #!/usr/bin/env node
+// tslint:disable:no-var-requires
+// tslint:disable:no-console
 
+import * as fs from 'fs';
+import * as path from 'path';
 import { migrator } from 'underbase';
 import * as yargs from 'yargs';
-import * as path from 'path';
-import * as fs from 'fs';
 
 // Enable ES6 module for ES2015
-require = require("esm")(module)
+require = require('esm')(module);
 
-interface configFile {
-  collectionName?: string,
-  backups?: boolean,
-  backupsDir?: string,
-  migrationsDir?: string,
-  db: string,
-  logs: boolean,
-  logger: any,
-  logIfLatest?: boolean,
-};
+interface IConfigFile {
+  collectionName?: string;
+  backups?: boolean;
+  backupsDir?: string;
+  migrationsDir?: string;
+  db: string;
+  logs: boolean;
+  logger: any;
+  logIfLatest?: boolean;
+}
 
-const logger = (level: string, ...arg: Array<string>) => console.log(`[${level}]`, ...arg);
+const logger = (level: string, ...arg: string[]) => console.log(`[${level}]`, ...arg);
 
 const argv = yargs
-  .scriptName("underbase-cli")
+  .scriptName('underbase-cli')
   .usage('Usage: $0 <command> [OPTIONS]')
   .command('migrate <migration>', 'Execute migrations')
   // .command('create <version>', 'Create a new migration')
@@ -43,30 +45,30 @@ const argv = yargs
   .locale('en_US')
   .parse();
 
-let configFile = <configFile>{};
-const workingDirectory = <string>argv.chdir || process.cwd();
+let configFile = {} as IConfigFile;
+const workingDirectory = argv.chdir as string || process.cwd();
 
 if (argv.config) {
-  configFile = require(path.join(<string>workingDirectory, <string>argv.config));
+  configFile = require(path.join(workingDirectory as string, argv.config as string));
 }
 
-const config = <configFile>{
-  // false disables logging
-  logs: argv.logs || configFile.logs || true,
-  // null or a function
-  logger: logger,
-  // enable/disable info log "already at latest."
+const config = {
+  // False disables logging
+  logs: argv.logs as boolean || configFile.logs as boolean || true,
+  // Null or a function
+  logger: logger as any,
+  // Enable/disable info log "already at latest."
   logIfLatest: true,
-  // migrations collection name. Defaults to 'migrations'
-  collectionName: argv.collectionName || configFile.collectionName || 'migrations',
-  // mongdb url
-  db: argv.db || configFile.db || null,
-  // enable automatic backups
-  backups: argv.backups || configFile.backups || false,
-  // directory to save backups
-  backupsDir: path.resolve(<string>argv.backupsDir || configFile.backupsDir || './migrations/backups'),
-  migrationsDir: path.resolve(<string>argv.migrationsDir || configFile.migrationsDir || './migrations'),
-};
+  // Migrations collection name. Defaults to 'migrations'
+  collectionName: argv.collectionName as string || configFile.collectionName as string || 'migrations',
+  // MongDB url
+  db: argv.db as string || configFile.db as string || null,
+  // Enable automatic backups
+  backups: argv.backups as boolean || configFile.backups as boolean || false,
+  // Directory to save backups
+  backupsDir: path.resolve(argv.backupsDir as string || configFile.backupsDir as string || './migrations/backups'),
+  migrationsDir: path.resolve(argv.migrationsDir as string || configFile.migrationsDir as string || './migrations'),
+} as IConfigFile;
 
 (async () => {
   if (!argv._[0]) {
@@ -79,49 +81,60 @@ const config = <configFile>{
     config.logger('info', 'Created migration directory.');
   }
 
-  let versions = <any>fs.readdirSync(config.migrationsDir)
-    .filter((v) => v.match(new RegExp(/^[\d].[\d]$/)));
+  let versions = fs.readdirSync(config.migrationsDir)
+    .filter((v: string) => v.match(new RegExp(/^[\d].[\d]$/))) as string[];
 
   switch (argv._[0]) {
-    case 'migrate':
-      versions = versions.map((v: string) => parseFloat(v));
+    case 'migrate': {
+      const versionsArray = versions.map((v: string) => parseFloat(v)) as number[];
 
-      if (argv.migration != 0 && versions.indexOf(parseFloat(<string>argv.migration)) < 0) {
+      if (argv.migration !== 0 && versionsArray.indexOf(parseFloat(argv.migration as string)) < 0) {
         logger('error', 'This version does not exists.');
         process.exit();
       }
 
-      versions = versions.map((v: number) => v.toFixed(1));
+      versions = versionsArray.map((v: number) => v.toFixed(1)) as string[];
 
       await migrator.config(config); // Returns a promise
 
-      versions.forEach(async (v: string) => {
+      versionsArray.forEach(async (v: number) => {
         const migrationObj = await require(`${config.migrationsDir}/${v}`).default;
         await migrator.add(migrationObj);
       });
 
       if (config.backups) {
-        logger('info', 'create backup')
+        logger('info', 'create backup');
       }
 
-      if (argv.rerun) await migrator.migrateTo(`${argv.migration},rerun`);
-      else await migrator.migrateTo(<string>argv.migration);
+      if (argv.rerun) {
+        await migrator.migrateTo(`${argv.migration},rerun`);
+      } else {
+        await migrator.migrateTo(argv.migration as string);
+      }
 
       break;
-    case 'list':
-      logger('info', 'Versions list based on folders')
+    }
+    case 'list': {
+      logger('info', 'Versions list based on folders');
+
       versions.forEach((v: string) => console.log(v));
+
       break;
-    case 'status':
+    }
+    case 'status': {
       await migrator.config(config); // Returns a promise
 
       const currentVersion = await migrator.getVersion();
 
       logger('info', `Current version is ${currentVersion}`);
+
       break;
-    default:
-      console.error('You should be doing', yargs.help())
+    }
+    default: {
+      console.error('Invalid command. Type --help to show available commands.');
+
       break;
+    }
   }
 
   process.exit();

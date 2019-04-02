@@ -9,15 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const fs = require("fs");
+const path = require("path");
 const underbase_1 = require("underbase");
 const yargs = require("yargs");
-const path = require("path");
-const fs = require("fs");
-require = require("esm")(module);
-;
+require = require('esm')(module);
 const logger = (level, ...arg) => console.log(`[${level}]`, ...arg);
 const argv = yargs
-    .scriptName("underbase-cli")
+    .scriptName('underbase-cli')
     .usage('Usage: $0 <command> [OPTIONS]')
     .command('migrate <migration>', 'Execute migrations')
     .command('list', 'Show all migrations versions')
@@ -28,7 +27,7 @@ const argv = yargs
     .describe('backups-dir <dir>', 'Backups directory')
     .describe('collection-name <name>', 'Migrations state collection')
     .describe('logs', 'Enable logs')
-    .describe('force', 'Force migrations execution')
+    .describe('rerun', 'Force migrations execution')
     .describe('chdir <dir>', 'Change the working directory')
     .describe('version', 'Show underbase-cli package version')
     .help('h', 'Show this help message')
@@ -62,38 +61,44 @@ const config = {
     let versions = fs.readdirSync(config.migrationsDir)
         .filter((v) => v.match(new RegExp(/^[\d].[\d]$/)));
     switch (argv._[0]) {
-        case 'migrate':
-            versions = versions.map((v) => parseFloat(v));
-            if (argv.migration != 0 && versions.indexOf(parseFloat(argv.migration)) < 0) {
+        case 'migrate': {
+            const versionsArray = versions.map((v) => parseFloat(v));
+            if (argv.migration !== 0 && versionsArray.indexOf(parseFloat(argv.migration)) < 0) {
                 logger('error', 'This version does not exists.');
                 process.exit();
             }
-            versions = versions.map((v) => v.toFixed(1));
+            versions = versionsArray.map((v) => v.toFixed(1));
             yield underbase_1.migrator.config(config);
-            versions.forEach((v) => __awaiter(this, void 0, void 0, function* () {
+            versionsArray.forEach((v) => __awaiter(this, void 0, void 0, function* () {
                 const migrationObj = yield require(`${config.migrationsDir}/${v}`).default;
                 yield underbase_1.migrator.add(migrationObj);
             }));
             if (config.backups) {
                 logger('info', 'create backup');
             }
-            if (argv.force)
+            if (argv.rerun) {
                 yield underbase_1.migrator.migrateTo(`${argv.migration},rerun`);
-            else
+            }
+            else {
                 yield underbase_1.migrator.migrateTo(argv.migration);
+            }
             break;
-        case 'list':
+        }
+        case 'list': {
             logger('info', 'Versions list based on folders');
             versions.forEach((v) => console.log(v));
             break;
-        case 'status':
+        }
+        case 'status': {
             yield underbase_1.migrator.config(config);
             const currentVersion = yield underbase_1.migrator.getVersion();
             logger('info', `Current version is ${currentVersion}`);
             break;
-        default:
-            console.error('You should be doing', yargs.help());
+        }
+        default: {
+            console.error('Invalid command. Type --help to show available commands.');
             break;
+        }
     }
     process.exit();
 }))();
