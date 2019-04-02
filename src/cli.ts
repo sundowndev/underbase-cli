@@ -66,8 +66,14 @@ const config = {
   // Enable automatic backups
   backups: argv.backups as boolean || configFile.backups as boolean || false,
   // Directory to save backups
-  backupsDir: path.resolve(argv.backupsDir as string || configFile.backupsDir as string || './migrations/backups'),
-  migrationsDir: path.resolve(argv.migrationsDir as string || configFile.migrationsDir as string || './migrations'),
+  backupsDir: path.resolve(path.join(
+    workingDirectory,
+    argv.backupsDir as string || configFile.backupsDir as string || './migrations/backups',
+  )),
+  migrationsDir: path.resolve(path.join(
+    workingDirectory,
+    argv.migrationsDir as string || configFile.migrationsDir as string || './migrations',
+  )),
 } as IConfigFile;
 
 (async () => {
