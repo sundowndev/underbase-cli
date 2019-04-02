@@ -2,18 +2,14 @@
   "name": "underbase-cli",
   "version": "1.0.2",
   "description": "CLI app for underbase - MongoDB schema migration library",
-  "main": "dist/src/cli.js",
-  "typings": "dist/src/cli.d.ts",
+  "main": "bin/cli.js",
+  "typings": "bin/cli.d.ts",
   "scripts": {
     "lint": "tslint --project .",
     "build": "tsc",
-    "build:watch": "rm -rf dist && tsc -w",
+    "build:watch": "rm -rf bin && tsc -w",
     "prestart": "npm run build:watch & sleep 12s",
-    "start": "npm run test",
-    "test": "jest dist/* --coverage --useStderr --forceExit",
-    "test:debug": "node --inspect=0.0.0.0:5857 node_modules/.bin/jest dist/* --coverage --useStderr --forceExit",
-    "test:watch": "jest dist/* --watchAll --useStderr --coverage",
-    "test:debug:watch": "node --inspect=0.0.0.0:5857 node_modules/.bin/jest dist/* --coverage --useStderr"
+    "start": "npm run test"
   },
   "author": "Raphaël Cerveaux <raphael@crvx.fr> (https://twitter.com/sundowndev)",
   "repository": {
