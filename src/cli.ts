@@ -35,7 +35,7 @@ const argv = yargs
   .describe('backups-dir <dir>', 'Backups directory')
   .describe('collection-name <name>', 'Migrations state collection')
   .describe('logs', 'Enable logs')
-  .describe('force', 'Force migrations execution')
+  .describe('rerun', 'Force migrations execution')
   .describe('chdir <dir>', 'Change the working directory')
   .describe('version', 'Show underbase-cli package version')
   .help('h', 'Show this help message')
@@ -104,7 +104,7 @@ const config = <configFile>{
         logger('info', 'create backup')
       }
 
-      if (argv.force) await migrator.migrateTo(`${argv.migration},rerun`);
+      if (argv.rerun) await migrator.migrateTo(`${argv.migration},rerun`);
       else await migrator.migrateTo(<string>argv.migration);
 
       break;
