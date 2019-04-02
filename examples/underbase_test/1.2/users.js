@@ -1,8 +1,6 @@
 
 export default {
   up: (db) => {
-    console.log('up users 1.2');
-
     db.collection('users')
       .updateMany(
         {},
@@ -12,8 +10,6 @@ export default {
       );
   },
   down: (db) => {
-    console.log('down users 1.2');
-
     db.collection('users')
       .updateMany(
         {},
