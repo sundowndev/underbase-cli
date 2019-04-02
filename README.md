@@ -31,7 +31,6 @@ Usage: underbase-cli <command> [OPTIONS]
 
 Commands:
   underbase-cli migrate <migration>  Execute migrations
-  underbase-cli create <version>     Create a new migration
   underbase-cli list                 Show all migrations versions
   underbase-cli status               Show migrations status
 
@@ -39,32 +38,13 @@ Options:
   --version                 Show underbase-cli package version         [boolean]
   --db <url>                MongoDB connection URL
   --migrations-dir <dir>    Migrations versions directory
-  --backups                 Enable automatic backups
+  --backup                  Enable automatic backups
   --backups-dir <dir>       Backups directory
   --collection-name <name>  Migrations state collection
   --logs                    Enable logs
-  --force                   Force migrations execution
+  --rerun                   Force migrations execution
   --chdir <dir>             Change the working directory
   -h, --help                Show this help message                     [boolean]
 ```
 
-## Configuration
-
-You can use json to configure Underbase by creating a `underbase.json` file at the root of your project :
-
-```json
-{
-  "db": "mongodb://localhost:27017/underbase_test",
-  "migrationsDir": "./examples",
-  "collectionName": "migrations",
-  "backupsDir": "./examples/backups",
-  "backups": true,
-  "logs": false
-}
-```
-
-Arguments can also be passed to the CLI program :
-
-```
-$ underbase-cli --db mongodb://localhost:27017/api --migrations-dir ./migrations
-```
+See [documentation](https://sundowndev.github.io/underbase/).
