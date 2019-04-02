@@ -2,6 +2,7 @@
 // tslint:disable:no-var-requires
 // tslint:disable:no-console
 
+import { exec } from 'child_process';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { migrator } from 'underbase';
@@ -20,9 +21,48 @@ interface IConfigFile {
   logger: any;
   logIfLatest?: boolean;
   chdir?: string;
+  mongodumpBinary: string;
+}
+
+interface IMigration {
+  version: number;
+  name: string;
+  up: (db: any) => Promise<any> | any;
+  down: (db: any) => Promise<any> | any;
 }
 
 const logger = (level: string, ...arg: string[]) => console.log(`[${level}]`, ...arg);
+
+const createBackup = (version: number) => new Promise((resolve, reject) => {
+  logger('info', 'Creating backup...');
+
+  const host = 'localhost:27017'; // TODO: replace this
+  const database = 'underbase_test'; // TODO: replace this
+
+  const backupFile = [
+    version.toFixed(1),
+    `${Date.now()}.gz`,
+  ].join('_');
+
+  const cmd = [
+    config.mongodumpBinary,
+    `--host ${host}`,
+    `--archive=${config.backupsDir}/${backupFile}`,
+    `--gzip --db ${database}`,
+  ].join(' ');
+
+  exec(cmd, (error, stdout, stderr) => {
+    if (error) {
+      logger('error', 'An error occured while creating backup... Cancelling.');
+      console.error(error);
+      process.exit();
+    }
+
+    logger('success', 'Backup created : ' + backupFile);
+
+    return resolve();
+  });
+});
 
 const argv = yargs
   .scriptName('underbase-cli')
@@ -42,6 +82,7 @@ const argv = yargs
   .describe('chdir <dir>', 'Change the working directory')
   .describe('version', 'Show underbase-cli package version')
   // .describe('template <file>', 'Template to use for new migration')
+  .describe('mongodumpBinary <bin>', 'Binary file for mongodump (it can be a docker exec command)')
   .help('h', 'Show this help message')
   .alias('h', 'help')
   .locale('en_US')
@@ -80,6 +121,7 @@ const config = {
     workingDirectory,
     argv.migrationsDir as string || configFile.migrationsDir as string || './migrations',
   )),
+  mongodumpBinary: argv.mongodumpBinary as string || configFile.mongodumpBinary as string || 'mongodump',
 } as IConfigFile;
 
 (async () => {
@@ -115,12 +157,15 @@ const config = {
       await migrator.config(config); // Returns a promise
 
       versions.forEach(async (v: string) => {
-        const migrationObj = await require(`${config.migrationsDir}/${v}`).default;
+        const migrationObj = await require(`${config.migrationsDir}/${v}`).default as IMigration;
+
         await migrator.add(migrationObj);
       });
 
       if (config.backup) {
-        logger('info', 'create backup');
+        const currentVersion = await migrator.getVersion();
+
+        await createBackup(currentVersion);
       }
 
       if (argv.rerun) {
