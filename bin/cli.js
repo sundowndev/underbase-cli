@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs = require("fs");
+const fs = require("fs-extra");
 const path = require("path");
 const underbase_1 = require("underbase");
 const yargs = require("yargs");
@@ -23,7 +23,7 @@ const argv = yargs
     .command('status', 'Show migrations status')
     .describe('db <url>', 'MongoDB connection URL')
     .describe('migrations-dir <dir>', 'Migrations versions directory')
-    .describe('backups', 'Enable automatic backups')
+    .describe('backup', 'Enable automatic backups')
     .describe('backups-dir <dir>', 'Backups directory')
     .describe('collection-name <name>', 'Migrations state collection')
     .describe('logs', 'Enable logs')
@@ -35,9 +35,12 @@ const argv = yargs
     .locale('en_US')
     .parse();
 let configFile = {};
-const workingDirectory = argv.chdir || process.cwd();
+let workingDirectory = argv.chdir || process.cwd();
 if (argv.config) {
-    configFile = require(path.join(workingDirectory, argv.config));
+    configFile = require(path.resolve(path.join(workingDirectory, argv.config)));
+}
+if (configFile.chdir) {
+    workingDirectory = configFile.chdir;
 }
 const config = {
     logs: argv.logs || configFile.logs || true,
@@ -45,18 +48,22 @@ const config = {
     logIfLatest: true,
     collectionName: argv.collectionName || configFile.collectionName || 'migrations',
     db: argv.db || configFile.db || null,
-    backups: argv.backups || configFile.backups || false,
-    backupsDir: path.resolve(argv.backupsDir || configFile.backupsDir || './migrations/backups'),
-    migrationsDir: path.resolve(argv.migrationsDir || configFile.migrationsDir || './migrations'),
+    backup: argv.backup || configFile.backup || false,
+    backupsDir: path.resolve(path.join(workingDirectory, argv.backupsDir || configFile.backupsDir || './migrations/backups')),
+    migrationsDir: path.resolve(path.join(workingDirectory, argv.migrationsDir || configFile.migrationsDir || './migrations')),
 };
 (() => __awaiter(this, void 0, void 0, function* () {
     if (!argv._[0]) {
-        yargs.help();
+        logger('error', 'Invalid command. Type --help to show available commands.');
         process.exit();
     }
     if (!fs.existsSync(config.migrationsDir)) {
-        fs.mkdirSync(config.migrationsDir);
+        fs.mkdirpSync(config.migrationsDir);
         config.logger('info', 'Created migration directory.');
+    }
+    if (!fs.existsSync(config.backupsDir)) {
+        fs.mkdirpSync(config.backupsDir);
+        config.logger('info', 'Created backup directory.');
     }
     let versions = fs.readdirSync(config.migrationsDir)
         .filter((v) => v.match(new RegExp(/^[\d].[\d]$/)));
@@ -69,11 +76,11 @@ const config = {
             }
             versions = versionsArray.map((v) => v.toFixed(1));
             yield underbase_1.migrator.config(config);
-            versionsArray.forEach((v) => __awaiter(this, void 0, void 0, function* () {
+            versions.forEach((v) => __awaiter(this, void 0, void 0, function* () {
                 const migrationObj = yield require(`${config.migrationsDir}/${v}`).default;
                 yield underbase_1.migrator.add(migrationObj);
             }));
-            if (config.backups) {
+            if (config.backup) {
                 logger('info', 'create backup');
             }
             if (argv.rerun) {
@@ -96,7 +103,7 @@ const config = {
             break;
         }
         default: {
-            console.error('Invalid command. Type --help to show available commands.');
+            logger('error', 'Invalid command. Type --help to show available commands.');
             break;
         }
     }
