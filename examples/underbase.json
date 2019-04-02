@@ -3,6 +3,6 @@
   "migrationsDir": "./examples/underbase_test",
   "collectionName": "migrations",
   "backupsDir": "./examples/underbase_test/backups",
-  "backups": true,
+  "backup": true,
   "logs": true
 }
