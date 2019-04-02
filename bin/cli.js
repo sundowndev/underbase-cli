@@ -9,12 +9,37 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const child_process_1 = require("child_process");
 const fs = require("fs-extra");
 const path = require("path");
 const underbase_1 = require("underbase");
 const yargs = require("yargs");
 require = require('esm')(module);
 const logger = (level, ...arg) => console.log(`[${level}]`, ...arg);
+const createBackup = (version) => new Promise((resolve, reject) => {
+    logger('info', 'Creating backup...');
+    const host = 'localhost:27017';
+    const database = 'underbase_test';
+    const backupFile = [
+        version.toFixed(1),
+        `${Date.now()}.gz`,
+    ].join('_');
+    const cmd = [
+        config.mongodumpBinary,
+        `--host ${host}`,
+        `--archive=${config.backupsDir}/${backupFile}`,
+        `--gzip --db ${database}`,
+    ].join(' ');
+    child_process_1.exec(cmd, (error, stdout, stderr) => {
+        if (error) {
+            logger('error', 'An error occured while creating backup... Cancelling.');
+            console.error(error);
+            process.exit();
+        }
+        logger('success', 'Backup created : ' + backupFile);
+        return resolve();
+    });
+});
 const argv = yargs
     .scriptName('underbase-cli')
     .usage('Usage: $0 <command> [OPTIONS]')
@@ -30,6 +55,7 @@ const argv = yargs
     .describe('rerun', 'Force migrations execution')
     .describe('chdir <dir>', 'Change the working directory')
     .describe('version', 'Show underbase-cli package version')
+    .describe('mongodumpBinary <bin>', 'Binary file for mongodump (it can be a docker exec command)')
     .help('h', 'Show this help message')
     .alias('h', 'help')
     .locale('en_US')
@@ -51,6 +77,7 @@ const config = {
     backup: argv.backup || configFile.backup || false,
     backupsDir: path.resolve(path.join(workingDirectory, argv.backupsDir || configFile.backupsDir || './migrations/backups')),
     migrationsDir: path.resolve(path.join(workingDirectory, argv.migrationsDir || configFile.migrationsDir || './migrations')),
+    mongodumpBinary: argv.mongodumpBinary || configFile.mongodumpBinary || 'mongodump',
 };
 (() => __awaiter(this, void 0, void 0, function* () {
     if (!argv._[0]) {
@@ -81,7 +108,8 @@ const config = {
                 yield underbase_1.migrator.add(migrationObj);
             }));
             if (config.backup) {
-                logger('info', 'create backup');
+                const currentVersion = yield underbase_1.migrator.getVersion();
+                yield createBackup(currentVersion);
             }
             if (argv.rerun) {
                 yield underbase_1.migrator.migrateTo(`${argv.migration},rerun`);
