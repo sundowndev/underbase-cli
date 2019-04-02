@@ -3,6 +3,7 @@
   "migrationsDir": "./examples/underbase_test",
   "collectionName": "migrations",
   "backupsDir": "./examples/underbase_test/backups",
+  "mongodumpBinary": "mongodump",
   "backup": true,
   "logs": true
 }
