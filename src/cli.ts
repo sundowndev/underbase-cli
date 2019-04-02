@@ -2,7 +2,7 @@
 // tslint:disable:no-var-requires
 // tslint:disable:no-console
 
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 import { migrator } from 'underbase';
 import * as yargs from 'yargs';
@@ -12,13 +12,14 @@ require = require('esm')(module);
 
 interface IConfigFile {
   collectionName?: string;
-  backups?: boolean;
+  backup?: boolean;
   backupsDir?: string;
   migrationsDir?: string;
   db: string;
   logs: boolean;
   logger: any;
   logIfLatest?: boolean;
+  chdir?: string;
 }
 
 const logger = (level: string, ...arg: string[]) => console.log(`[${level}]`, ...arg);
@@ -27,29 +28,34 @@ const argv = yargs
   .scriptName('underbase-cli')
   .usage('Usage: $0 <command> [OPTIONS]')
   .command('migrate <migration>', 'Execute migrations')
-  // .command('create <version>', 'Create a new migration')
+  // .command('create <migration>', 'Create a new migration')
   .command('list', 'Show all migrations versions')
   .command('status', 'Show migrations status')
   // .command('restore', 'Restore a database backup')
   .describe('db <url>', 'MongoDB connection URL')
   .describe('migrations-dir <dir>', 'Migrations versions directory')
-  .describe('backups', 'Enable automatic backups')
+  .describe('backup', 'Enable automatic backups')
   .describe('backups-dir <dir>', 'Backups directory')
   .describe('collection-name <name>', 'Migrations state collection')
   .describe('logs', 'Enable logs')
   .describe('rerun', 'Force migrations execution')
   .describe('chdir <dir>', 'Change the working directory')
   .describe('version', 'Show underbase-cli package version')
+  // .describe('template <file>', 'Template to use for new migration')
   .help('h', 'Show this help message')
   .alias('h', 'help')
   .locale('en_US')
   .parse();
 
 let configFile = {} as IConfigFile;
-const workingDirectory = argv.chdir as string || process.cwd();
+let workingDirectory = argv.chdir as string || process.cwd();
 
 if (argv.config) {
-  configFile = require(path.join(workingDirectory as string, argv.config as string));
+  configFile = require(path.resolve(path.join(workingDirectory as string, argv.config as string)));
+}
+
+if (configFile.chdir) {
+  workingDirectory = configFile.chdir;
 }
 
 const config = {
@@ -64,7 +70,7 @@ const config = {
   // MongDB url
   db: argv.db as string || configFile.db as string || null,
   // Enable automatic backups
-  backups: argv.backups as boolean || configFile.backups as boolean || false,
+  backup: argv.backup as boolean || configFile.backup as boolean || false,
   // Directory to save backups
   backupsDir: path.resolve(path.join(
     workingDirectory,
@@ -78,13 +84,18 @@ const config = {
 
 (async () => {
   if (!argv._[0]) {
-    yargs.help();
+    logger('error', 'Invalid command. Type --help to show available commands.');
     process.exit();
   }
 
   if (!fs.existsSync(config.migrationsDir)) {
-    fs.mkdirSync(config.migrationsDir);
+    fs.mkdirpSync(config.migrationsDir);
     config.logger('info', 'Created migration directory.');
+  }
+
+  if (!fs.existsSync(config.backupsDir)) {
+    fs.mkdirpSync(config.backupsDir);
+    config.logger('info', 'Created backup directory.');
   }
 
   let versions = fs.readdirSync(config.migrationsDir)
@@ -103,12 +114,12 @@ const config = {
 
       await migrator.config(config); // Returns a promise
 
-      versionsArray.forEach(async (v: number) => {
+      versions.forEach(async (v: string) => {
         const migrationObj = await require(`${config.migrationsDir}/${v}`).default;
         await migrator.add(migrationObj);
       });
 
-      if (config.backups) {
+      if (config.backup) {
         logger('info', 'create backup');
       }
 
@@ -137,8 +148,7 @@ const config = {
       break;
     }
     default: {
-      console.error('Invalid command. Type --help to show available commands.');
-
+      logger('error', 'Invalid command. Type --help to show available commands.');
       break;
     }
   }
