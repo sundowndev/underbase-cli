@@ -41,7 +41,7 @@ if (argv.config) {
     configFile = require(path.join(workingDirectory, argv.config));
 }
 const config = {
-    log: argv.logs || configFile.logs || true,
+    logs: argv.logs || configFile.logs || true,
     logger: logger,
     logIfLatest: true,
     collectionName: argv.collectionName || configFile.collectionName || 'migrations',

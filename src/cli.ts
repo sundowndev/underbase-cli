@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 // Enable ES6 module for ES2015
-require = require("esm")(module/*, options*/)
+require = require("esm")(module)
 
 interface configFile {
   collectionName?: string,
@@ -14,9 +14,8 @@ interface configFile {
   backupsDir?: string,
   migrationsDir?: string,
   db: string,
-  logs?: boolean,
-  log?: boolean,
-  logger?: any,
+  logs: boolean,
+  logger: any,
   logIfLatest?: boolean,
 };
 
@@ -53,7 +52,7 @@ if (argv.config) {
 
 const config = <configFile>{
   // false disables logging
-  log: argv.logs || configFile.logs || true,
+  logs: argv.logs || configFile.logs || true,
   // null or a function
   logger: logger,
   // enable/disable info log "already at latest."
