@@ -1,8 +1,8 @@
 {
   "db": "mongodb://localhost:27017/underbase_test",
-  "migrationsDir": "./examples",
+  "migrationsDir": "./examples/underbase_test",
   "collectionName": "migrations",
-  "backupsDir": "./examples/backups",
+  "backupsDir": "./examples/underbase_test/backups",
   "backups": true,
-  "logs": false
+  "logs": true
 }
