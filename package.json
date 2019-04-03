@@ -1,6 +1,6 @@
 {
   "name": "underbase-cli",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "CLI app for underbase - MongoDB schema migration library",
   "main": "dist/src/cli.js",
   "typings": "dist/src/cli.d.ts",
@@ -51,7 +51,7 @@
   },
   "dependencies": {
     "@types/bluebird": "3.5.26",
-    "bluebird": "3.5.3",
+    "bluebird": "3.5.4",
     "lodash": "4.17.11",
     "mongodb": "3.2.2",
     "type-check": "0.3.2",
