@@ -1,6 +1,6 @@
 {
   "name": "underbase-cli",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "CLI app for underbase - MongoDB schema migration library",
   "main": "dist/src/cli.js",
   "typings": "dist/src/cli.d.ts",
@@ -42,7 +42,7 @@
     "@types/node": "10.14.3",
     "@types/yargs": "12.0.11",
     "esm": "3.2.20",
-    "jest": "24.5.0",
+    "jest": "24.7.1",
     "tslint": "5.12.1",
     "tslint-eslint-rules": "5.4.0",
     "tslint-microsoft-contrib": "6.0.0",
