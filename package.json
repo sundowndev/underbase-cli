@@ -1,6 +1,6 @@
 {
   "name": "underbase-cli",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "CLI app for underbase - MongoDB schema migration library",
   "main": "bin/cli.js",
   "typings": "bin/cli.d.ts",
@@ -44,13 +44,9 @@
     "vrsource-tslint-rules": "6.0.0"
   },
   "dependencies": {
-    "@types/bluebird": "3.5.26",
-    "bluebird": "3.5.3",
     "fs-extra": "^7.0.1",
-    "lodash": "4.17.11",
-    "mongodb": "3.2.2",
-    "type-check": "0.3.2",
-    "underbase": "^1.0.1"
+    "underbase": "^1.0.1",
+    "yargs": "13.2.2"
   },
   "jest": {
     "testEnvironment": "node",
