@@ -6,7 +6,7 @@
     "noImplicitAny": true,
     "declaration": true,
     "rootDir": "src",
-    "outDir": "bin",
+    "outDir": "build",
     "baseUrl": ".",
     "sourceMap": false,
     "typeRoots": [
