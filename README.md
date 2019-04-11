@@ -1,3 +1,5 @@
+## DEPRECATED: see [underbase](https://github.com/sundowndev/underbase) instead
+
 # underbase-cli
 
 [![build status](https://img.shields.io/travis/sundowndev/underbase-cli/master.svg?style=flat-square)](https://travis-ci.org/sundowndev/underbase-cli)
